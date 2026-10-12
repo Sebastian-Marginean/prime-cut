@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+/*
+  Prime Cut design tokens. The brand is black marble + ember gold, so the
+  site is dark-only by design.
+  Shape rule: buttons are full pills, cards and images are rounded-2xl.
+  Z-index scale: 10 header, 20 mobile menu.
+*/
+@theme {
+  --color-ink: #0e0c0b;
+  --color-ink-2: #171311;
+  --color-cream: #f3ece4;
+  --color-muted: #b8ab9d;
+  --color-ember: #e9a54b;
+  --color-ember-deep: #c97a2a;
+  --color-line: rgb(233 165 75 / 0.16);
+
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background: var(--color-ink);
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--color-cream);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Marble lives on a fixed layer so it never repaints while scrolling. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgb(14 12 11 / 0.55), rgb(14 12 11 / 0.7) 80%),
+    url("/img/marble.webp") center / cover no-repeat,
+    var(--color-ink);
+}
+@media (max-width: 768px) {
+  body::before {
+    background:
+      radial-gradient(ellipse at 50% 30%, rgb(14 12 11 / 0.6), rgb(14 12 11 / 0.72) 80%),
+      url("/img/marble-1200.webp") center / cover no-repeat,
+      var(--color-ink);
+  }
+}
+
+@utility font-wide {
+  font-variation-settings: "wdth" 125;
+}
+@utility font-display {
+  font-variation-settings: "wdth" 112;
+  letter-spacing: -0.025em;
+}
+
+/* Frosted panel; pair with Tailwind's backdrop-blur-xl backdrop-saturate-150
+   (a hand-written backdrop-filter here gets dropped by the CSS minifier). */
+@utility glass {
+  background: linear-gradient(180deg, rgb(28 22 19 / 0.72), rgb(18 15 13 / 0.6));
+  border: 1px solid var(--color-line);
+  box-shadow: inset 0 1px 0 rgb(255 236 210 / 0.06);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: var(--color-ink-2);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ember);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: rgb(233 165 75 / 0.35);
+}
+
+/* Cheese marquee */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee 60s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .marquee-track {
+    animation: none;
+  }
+}

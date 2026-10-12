@@ -33,3 +33,7 @@ The skill triggers automatically when Claude builds UI. You can also call it exp
 skills/
   taste/SKILL.md     the skill
 ```
+
+## Website
+
+The Prime Cut Meat presentation site lives in [`site/`](site/) (Next.js, static export). See [site/README.md](site/README.md) for how to run, edit products and deploy. When deploying on Vercel, set **Root Directory** to `site`.
