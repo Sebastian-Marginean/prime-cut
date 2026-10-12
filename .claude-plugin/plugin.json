@@ -1,0 +1,8 @@
+{
+  "name": "taste",
+  "version": "0.1.0",
+  "description": "Design taste for UI work: typography, spacing, color and layout rules that keep interfaces from looking generic.",
+  "author": {
+    "name": "Sebastian Marginean"
+  }
+}
