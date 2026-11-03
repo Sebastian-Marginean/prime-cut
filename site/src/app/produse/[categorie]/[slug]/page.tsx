@@ -53,7 +53,7 @@ export default async function ProductPage({ params }: Params) {
             className={
               cutout
                 ? "mx-auto aspect-square w-full max-w-lg object-contain drop-shadow-[0_24px_40px_rgb(0_0_0/0.6)]"
-                : "aspect-[4/3] w-full object-cover"
+                : `${p.category === "carne-de-vita" ? "aspect-[37/20]" : "aspect-[4/3]"} w-full object-cover`
             }
           />
         </div>

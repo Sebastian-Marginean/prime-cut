@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { categories, getCategory, productsIn } from "@/lib/products";
 import { CategoryTabs } from "@/components/CategoryTabs";
 import { ProductCard } from "@/components/ProductCard";
+import { CustomPlatter } from "@/components/CustomPlatter";
 
 type Params = { params: Promise<{ categorie: string }> };
 
@@ -32,6 +33,11 @@ export default async function CategoryPage({ params }: Params) {
           </li>
         ))}
       </ul>
+      {c.slug === "platouri" && (
+        <div className="-mx-4 sm:-mx-6">
+          <CustomPlatter />
+        </div>
+      )}
     </div>
   );
 }

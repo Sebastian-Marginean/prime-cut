@@ -77,14 +77,50 @@ body::before {
   }
 }
 
-:focus-visible {
-  outline: 2px solid var(--color-ember);
-  outline-offset: 3px;
-  border-radius: 6px;
+/* In the base layer so utilities (e.g. on form fields) can override it. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-ember);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
 }
 
 ::selection {
   background: rgb(233 165 75 / 0.35);
+}
+
+/* Day numeral swap in the aging section */
+@keyframes day-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* Platter builder */
+@keyframes slice-in {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+}
+.slice-in {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: slice-in 0.5s var(--ease-out-expo);
+}
+[data-slot]:focus-visible > .slot-ring {
+  stroke: var(--color-ember);
+  stroke-width: 2.5px;
+}
+
+/* Horizontal scrollers that draw their own progress bar */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* Cheese marquee */

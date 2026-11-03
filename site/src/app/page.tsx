@@ -3,7 +3,9 @@ import { Categories } from "@/components/home/Categories";
 import { Aging } from "@/components/home/Aging";
 import { Cuts } from "@/components/home/Cuts";
 import { Platters } from "@/components/home/Platters";
+import { CustomPlatter } from "@/components/CustomPlatter";
 import { Cheeses } from "@/components/home/Cheeses";
+import { Reviews } from "@/components/home/Reviews";
 import { Contact } from "@/components/home/Contact";
 
 export default function HomePage() {
@@ -14,7 +16,9 @@ export default function HomePage() {
       <Aging />
       <Cuts />
       <Platters />
+      <CustomPlatter />
       <Cheeses />
+      <Reviews />
       <Contact />
     </>
   );

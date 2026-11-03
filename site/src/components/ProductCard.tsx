@@ -4,6 +4,8 @@ import { ProductImage } from "@/components/ProductImage";
 
 export function ProductCard({ product: p }: { product: Product }) {
   const cutout = isCutout(p.slug);
+  // Meat is shot wide on a long board; a wide frame keeps the whole cut in view.
+  const frame = p.category === "carne-de-vita" ? "aspect-[37/20]" : "aspect-[4/3]";
   return (
     <Link href={productHref(p)} className="group block">
       <div
@@ -18,7 +20,7 @@ export function ProductCard({ product: p }: { product: Product }) {
           className={`w-full transition-transform duration-[1.2s] ease-out-expo ${
             cutout
               ? "aspect-square object-contain drop-shadow-[0_18px_28px_rgb(0_0_0/0.55)] group-hover:-translate-y-2"
-              : "aspect-[4/3] object-cover group-hover:scale-105"
+              : `${frame} object-cover group-hover:scale-105`
           }`}
         />
       </div>

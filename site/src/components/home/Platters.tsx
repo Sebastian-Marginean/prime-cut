@@ -73,6 +73,16 @@ export function Platters() {
           >
             Detalii despre {p.name.toLowerCase()}
           </Link>
+          <a
+            href="#platou-personalizat"
+            className="mt-8 flex items-center justify-between gap-4 rounded-2xl border border-line p-5 transition-colors duration-300 hover:border-ember"
+          >
+            <span>
+              <span className="block font-semibold">Vrei alte brânzeturi?</span>
+              <span className="mt-1 block text-sm text-muted">Compune-ți singur platoul, din cele 18 sortimente.</span>
+            </span>
+            <span aria-hidden className="text-xl text-ember">→</span>
+          </a>
         </div>
       </div>
     </section>

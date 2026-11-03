@@ -40,7 +40,7 @@ export const categories: Category[] = [
   {
     slug: "branzeturi",
     name: "Brânzeturi",
-    tagline: "20 de sortimente de Gouda olandez",
+    tagline: "18 sortimente de Gouda olandez",
     description:
       "Roți de Gouda de la Huizer Kaas-Gilde, din Olanda: clasice, cu ierburi, condimente, trufe sau lapte de capră.",
     cover: "gouda-trufe-negre",
@@ -140,7 +140,7 @@ const cheeses: Product[] = [
   cheese("gouda-piper-negru", "Gouda cu piper negru", "Picant, cu boabe de piper.", "Gouda clasic cu boabe de piper negru zdrobite, care îi dau o notă picantă și caldă.", "Bere, vin roșu sec, sandvișuri"),
   cheese("gouda-lamaie-neagra", "Gouda cu lămâie neagră", "Coajă neagră, gust citric.", "Gouda cu lămâie neagră, cu note citrice și ușor afumate. Coaja neagră îl face ușor de recunoscut pe platou.", "Vin alb, pește, salate"),
   cheese("branza-cu-mucegai-albastru", "Brânză cu mucegai albastru", "Intensă, cu vinișoare albastre.", "Brânză de tip Gouda cu vinișoare de mucegai nobil. Gust intens, sărat și cremos.", "Pere, nuci, vin dulce"),
-  cheese("gouda-chimion", "Gouda cu chimion", "Clasic olandez, aromat.", "Una dintre combinațiile tradiționale olandeze: Gouda cu semințe de chimion, cu aromă caldă și ușor pământie.", "Bere, pâine neagră, mezeluri"),
+  cheese("gouda-chimion", "Gouda cu chimen", "Clasic olandez, aromat.", "Una dintre combinațiile tradiționale olandeze: Gouda cu semințe de chimen, cu aromă caldă și ușor pământie.", "Bere, pâine neagră, mezeluri"),
   cheese("gouda-ierburi-de-gradina", "Gouda cu ierburi de grădină", "Proaspăt, cu ierburi verzi.", "Gouda cu un amestec de ierburi de grădină, cu gust proaspăt și verde.", "Vin alb, roșii, focaccia"),
   cheese("gouda-usturoi", "Gouda cu usturoi", "Gust plin, cu usturoi.", "Gouda cu usturoi, cu gust plin și aromat. Foarte bun topit.", "Burgeri, toast, bere"),
   cheese("gouda-pesto-verde", "Gouda cu pesto verde", "Busuioc și verdeață.", "Gouda cu pesto verde, cu aromă de busuioc. Culoarea verde intensă se vede frumos pe platou.", "Vin alb, roșii, paste"),
@@ -149,12 +149,10 @@ const cheeses: Product[] = [
   cheese("gouda-chili-rosu", "Gouda cu chili roșu", "Iute, cu ardei chili.", "Gouda cu ardei chili roșu, pentru cei care preferă o brânză cu mai mult foc.", "Bere, mezeluri picante"),
   cheese("gouda-lavanda", "Gouda cu lavandă", "Floral și delicat.", "Gouda cu flori de lavandă, cu aromă florală delicată și coajă violet.", "Vin rosé, miere, fructe"),
   cheese("gouda-mustar", "Gouda cu muștar", "Semințe de muștar, gust vioi.", "Gouda cu semințe de muștar, cu gust vioi și ușor înțepător.", "Mezeluri, cârnați, bere"),
-  cheese("gouda-urzica", "Gouda cu urzică", "Verde, ierbos.", "Gouda cu frunze de urzică, cu gust ierbos și ușor.", "Vin alb, pâine cu semințe"),
   cheese("gouda-mix-de-nuci", "Gouda cu mix de nuci", "Crocant, cu nuci.", "Gouda cu un amestec de nuci, cu textură crocantă și gust ușor dulce.", "Vin roșu, struguri, miere"),
   cheese("gouda-masline-si-rosii", "Gouda cu măsline și roșii", "Gust mediteranean.", "Gouda cu măsline și roșii, cu gust mediteranean, ușor sărat.", "Vin rosé, focaccia, salate"),
   cheese("branza-de-capra-maturata", "Brânză de capră maturată", "Fermă, cu gust pronunțat.", "Brânză de capră maturată, cu textură fermă și gust pronunțat, ușor dulce.", "Vin alb sec, smochine, nuci", "Capră"),
   cheese("branza-de-capra-mild", "Brânză de capră, gust delicat", "Albă, fină și cremoasă.", "Brânză de capră tânără, albă și cremoasă, cu gust fin. Bună alegere pentru cei care gustă prima dată brânză de capră.", "Vin alb, miere, fructe", "Capră"),
-  cheese("branza-de-capra-cu-urzica", "Brânză de capră cu urzică", "Capră și urzică.", "Brânză de capră cu frunze de urzică, cu gust proaspăt și ierbos.", "Vin alb, salate", "Capră"),
   cheese("tricolore-capra-si-vaca", "Tricolore, capră și vacă", "Trei culori, două tipuri de lapte.", "Brânză din lapte de capră și de vacă, cu bucăți colorate în trei nuanțe. Arată spectaculos pe platou.", "Vin rosé, platouri aperitiv", "Capră și vacă"),
 ];
 

@@ -39,7 +39,7 @@ export function Categories() {
               slug={meat.cover}
               alt="T-bone de vită maturat, pe fund de lemn"
               sizes="(min-width: 768px) 66vw, 100vw"
-              className="absolute inset-0 -z-10 size-full object-cover transition-transform duration-[1.2s] ease-out-expo group-hover:scale-105"
+              className="absolute inset-0 -z-10 size-full object-cover object-[30%_50%] transition-transform duration-[1.2s] ease-out-expo group-hover:scale-105"
             />
             <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/95 via-ink/30 to-transparent" />
             <TileText name={meat.name} tagline={meat.tagline} />

@@ -12,10 +12,10 @@ export function Cheeses() {
     <section aria-labelledby="branzeturi" className="py-24 md:py-32">
       <Reveal className="mx-auto max-w-7xl px-4 sm:px-6">
         <h2 id="branzeturi" className="font-display max-w-2xl text-3xl font-semibold leading-tight md:text-5xl">
-          20 de feluri de Gouda, din Olanda.
+          18 feluri de Gouda, din Olanda.
         </h2>
         <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted">
-          De la clasicul cu chimion până la trufe negre, lavandă sau lapte de capră. Toate de la Huizer Kaas-Gilde.
+          De la clasicul cu chimen până la trufe negre, lavandă sau lapte de capră. Toate de la Huizer Kaas-Gilde.
         </p>
       </Reveal>
 
