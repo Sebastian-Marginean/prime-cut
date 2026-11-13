@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useMotionValueEvent, useScroll, useReducedMotion } from "motion/react";
 import { List, X } from "@phosphor-icons/react";
 import { categories } from "@/lib/products";
 
@@ -14,12 +13,15 @@ const links = [
 
 export function Header() {
   const pathname = usePathname();
-  const { scrollY } = useScroll();
-  const reduce = useReducedMotion();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
-  useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 24));
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
     document.documentElement.style.overflow = open ? "hidden" : "";
@@ -38,7 +40,7 @@ export function Header() {
         }`}
       >
         <Link href="/" className="flex items-center gap-3" aria-label="Prime Cut Meat, pagina principală">
-          <img src="/img/logo-round-512.webp" alt="" width={44} height={44} className="size-11 rounded-full" />
+          <img src="/img/logo-round-144.webp" alt="" width={44} height={44} className="size-11 rounded-full" />
           <span className="font-wide text-[13px] font-bold uppercase tracking-[0.14em] max-sm:hidden">Prime Cut</span>
         </Link>
 
@@ -77,16 +79,11 @@ export function Header() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {open && (
-          <motion.nav
+      {open && (
+          <nav
             id="mobile-menu"
             aria-label="Meniu mobil"
-            initial={reduce ? false : { opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -12 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="glass relative z-20 bg-ink/90 backdrop-blur-xl backdrop-saturate-150 mx-auto mt-2 max-w-7xl rounded-2xl p-3 lg:hidden"
+            className="menu-in glass relative z-20 bg-ink/90 backdrop-blur-xl backdrop-saturate-150 mx-auto mt-2 max-w-7xl rounded-2xl p-3 lg:hidden"
           >
             {[...links, { href: "/#contact", label: "Contactează-ne" }].map((l) => (
               <Link
@@ -98,9 +95,8 @@ export function Header() {
                 {l.label}
               </Link>
             ))}
-          </motion.nav>
+          </nav>
         )}
-      </AnimatePresence>
     </header>
   );
 }

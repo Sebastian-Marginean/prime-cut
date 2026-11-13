@@ -42,7 +42,7 @@ export default async function ProductPage({ params }: Params) {
       <div className="mt-8 grid items-center gap-10 md:grid-cols-[1.2fr_1fr] md:gap-16">
         <div
           className={`overflow-hidden rounded-2xl border border-line ${
-            cutout ? "bg-[radial-gradient(ellipse_at_50%_35%,rgb(233_165_75/0.16),transparent_70%)] p-10" : ""
+            cutout ? "bg-[radial-gradient(ellipse_at_50%_35%,rgb(233_165_75/0.16),transparent_70%)] p-6" : ""
           }`}
         >
           <ProductImage

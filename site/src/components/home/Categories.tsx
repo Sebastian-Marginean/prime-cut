@@ -53,7 +53,7 @@ export function Categories() {
           >
             <ProductImage
               slug={platters.cover}
-              alt="Platou cu brânzeturi colorate, mezeluri, struguri și nuci"
+              alt="Platou cu brânzeturi colorate, ceafă, struguri și nuci"
               sizes="(min-width: 768px) 33vw, 100vw"
               className="absolute inset-0 -z-10 size-full object-cover transition-transform duration-[1.2s] ease-out-expo group-hover:scale-105"
             />
@@ -74,7 +74,7 @@ export function Categories() {
                   slug={s}
                   alt=""
                   sizes="160px"
-                  className={`w-1/2 drop-shadow-[0_12px_24px_rgb(0_0_0/0.5)] ${i ? "-ml-[22%]" : ""} ${i === 1 ? "relative z-[1] -mt-2" : "mt-6"}`}
+                  className={`aspect-square h-auto w-1/2 self-start drop-shadow-[0_12px_24px_rgb(0_0_0/0.5)] ${i ? "-ml-[22%]" : ""} ${i === 1 ? "relative z-[1] -mt-2" : "mt-6"}`}
                 />
               ))}
             </div>

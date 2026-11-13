@@ -5,24 +5,25 @@ export const site = {
   url: "https://primecut.ro", // TODO: domeniul real
   description:
     "Carne de vită maturată 14-21 de zile, brânzeturi olandeze și platouri pregătite la comandă.",
-  phone: "", // TODO: ex. "+40 7xx xxx xxx"
-  whatsapp: "", // TODO: același număr, doar cifre, ex. "407xxxxxxxx"
-  email: "", // TODO: ex. "comenzi@primecut.ro"
+  phone: "0773 861 499",
+  whatsapp: "40773861499",
+  email: "office.primecutmeat@gmail.com",
   address: "", // TODO: adresa magazinului sau zona de livrare
   hours: [
-    // TODO: programul real
-    { days: "Luni - Vineri", time: "09:00 - 18:00" },
-    { days: "Sâmbătă", time: "09:00 - 14:00" },
+    { days: "Luni - Vineri", time: "08:00 - 18:00" },
+    { days: "Sâmbătă", time: "08:00 - 14:00" },
   ],
   instagram: "https://www.instagram.com/prime_cut_meat/",
   facebook: "https://www.facebook.com/profile.php?id=61592600999375",
   // Contact form delivery. The site is static, so messages go through
   // FormSubmit (formsubmit.co): put the inbox here and the first message
   // triggers a one-time confirmation email to that address.
-  formEmail: "", // TODO: adresa la care ajung mesajele din formular
+  formEmail: "office.primecutmeat@gmail.com",
 };
 
 export const formEndpoint = site.formEmail ? `https://formsubmit.co/ajax/${site.formEmail}` : "";
+// Regular (non-AJAX) endpoint, used when the message carries a file attachment.
+export const formAction = site.formEmail ? `https://formsubmit.co/${site.formEmail}` : "";
 
 export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;
 

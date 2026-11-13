@@ -17,7 +17,7 @@ export default function ProductsPage() {
         <CategoryTabs />
       </div>
 
-      {categories.map((c) => (
+      {categories.map((c, ci) => (
         <section key={c.slug} aria-labelledby={c.slug} className="mt-20">
           <div className="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
             <div>
@@ -31,9 +31,10 @@ export default function ProductsPage() {
             </Link>
           </div>
           <ul className="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-            {productsIn(c.slug).map((p) => (
+            {productsIn(c.slug).map((p, i) => (
               <li key={p.slug}>
-                <ProductCard product={p} />
+                {/* First row of the first category is on screen right away. */}
+                <ProductCard product={p} priority={ci === 0 && i === 0} eager={ci === 0 && i < 3} />
               </li>
             ))}
           </ul>

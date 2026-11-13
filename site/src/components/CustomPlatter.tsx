@@ -1,4 +1,4 @@
-import { PlatterBuilder } from "@/components/PlatterBuilder";
+import { LazyPlatterBuilder } from "@/components/LazyPlatterBuilder";
 import { Reveal } from "@/components/Reveal";
 
 export function CustomPlatter() {
@@ -20,7 +20,7 @@ export function CustomPlatter() {
         </p>
       </Reveal>
       <div className="mt-12">
-        <PlatterBuilder />
+        <LazyPlatterBuilder />
       </div>
     </section>
   );

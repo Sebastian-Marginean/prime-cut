@@ -136,11 +136,63 @@ body::before {
   animation-play-state: paused;
 }
 
+/* Entrance animations, pure CSS so nothing waits for JavaScript. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+.rise {
+  animation: rise 0.9s var(--ease-out-expo) both;
+}
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.08);
+  }
+}
+.hero-zoom {
+  animation: hero-zoom 2.2s var(--ease-out-expo) both;
+}
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+.menu-in {
+  animation: menu-in 0.35s var(--ease-out-expo);
+}
+
+/* Scroll reveal (see Reveal.tsx). Content is only hidden when scripts run,
+   so it can never get stuck invisible. */
+.reveal {
+  transition:
+    opacity 0.8s var(--ease-out-expo),
+    transform 0.8s var(--ease-out-expo);
+}
+@media (scripting: enabled) {
+  .reveal:not(.is-visible) {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  .marquee-track {
+  .marquee-track,
+  .rise,
+  .hero-zoom,
+  .menu-in,
+  .slice-in {
     animation: none;
+  }
+  .reveal,
+  .reveal:not(.is-visible) {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

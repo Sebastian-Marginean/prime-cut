@@ -14,8 +14,8 @@ const days = [
   {
     day: 7,
     img: "aging-07",
-    title: "Fibrele se relaxează",
-    text: "Enzimele naturale din carne încep să înmoaie fibrele.",
+    title: "Fibrele încep să se descompună",
+    text: "Enzimele naturale din carne încep să frăgezească fibrele.",
   },
   {
     day: 14,
@@ -27,7 +27,7 @@ const days = [
     day: 21,
     img: "aging-21",
     title: "Gata de servit",
-    text: "Carnea ajunge la maturitate: gust profund, aromă bogată și o textură care se taie ușor și rămâne suculentă.",
+    text: "Carnea ajunge la punctul optim de maturare: gust profund, aromă bogată și o textură care se taie ușor și rămâne suculentă.",
   },
 ];
 
@@ -82,7 +82,6 @@ export function Aging() {
                     slug={d.img}
                     alt={`Carne de vită în ziua ${d.day} de maturare`}
                     sizes="(min-width: 1280px) 42rem, 52vw"
-                    eager
                     className={`absolute inset-0 size-full object-cover transition-[opacity,transform] duration-[900ms] ease-out-expo ${
                       i === active ? "scale-100 opacity-100" : "scale-[1.04] opacity-0"
                     }`}

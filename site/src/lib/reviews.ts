@@ -4,6 +4,10 @@
 // dezvoltare (npm run dev) și nu ajunge pe site-ul publicat.
 export const placeholder = true;
 
+// Pornește/oprește secțiunea de recenzii de pe tot site-ul. E oprită până
+// primim recenzii reale; atunci le punem mai jos și o pornim (true).
+export const showReviews = false;
+
 export type Review = {
   name: string;
   city: string;

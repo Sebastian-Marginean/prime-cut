@@ -27,8 +27,7 @@ export function Cheeses() {
                 <ProductImage
                   slug={p.slug}
                   alt={p.name}
-                  sizes="224px"
-                  eager
+                  sizes="(min-width: 768px) 224px, 176px"
                   className="aspect-square w-full object-contain drop-shadow-[0_18px_28px_rgb(0_0_0/0.55)] transition-transform duration-700 ease-out-expo group-hover:-translate-y-2"
                 />
                 <span className="mt-3 block text-sm text-cream/85 transition-colors group-hover:text-ember">{p.name}</span>

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CheckCircle, PaperPlaneTilt, WarningCircle } from "@phosphor-icons/react";
-import { formEndpoint, site } from "@/lib/site";
+import { CheckCircle, PaperPlaneTilt, WarningCircle, X } from "@phosphor-icons/react";
+import { formAction, formEndpoint, site } from "@/lib/site";
 import { PREFILL_EVENT, PREFILL_KEY, type Prefill } from "@/lib/platter";
 
 const subjects = ["Carne de vită", "Platou", "Platou personalizat", "Brânzeturi", "Altceva"];
@@ -13,17 +13,23 @@ const label = "text-sm font-semibold text-cream";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
+// After a form with an attachment is posted, FormSubmit sends the visitor back here.
+const SENT_FLAG = "trimis";
+
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [subject, setSubject] = useState(subjects[0]);
   const [message, setMessage] = useState("");
+  const [image, setImage] = useState<string>();
   const messageRef = useRef<HTMLTextAreaElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   // A platter built in the configurator arrives here as a ready-made message.
   useEffect(() => {
     const apply = (p: Prefill) => {
       setSubject(p.subject);
       setMessage(p.message);
+      setImage(p.image);
       setStatus("idle");
       setTimeout(() => {
         const el = messageRef.current;
@@ -31,6 +37,12 @@ export function ContactForm() {
         el?.setSelectionRange(el.value.length, el.value.length);
       }, 600);
     };
+    const url = new URL(window.location.href);
+    if (url.searchParams.has(SENT_FLAG)) {
+      setStatus("sent");
+      url.searchParams.delete(SENT_FLAG);
+      window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+    }
     try {
       const saved = sessionStorage.getItem(PREFILL_KEY);
       if (saved) {
@@ -58,6 +70,35 @@ export function ContactForm() {
       return;
     }
     setStatus("sending");
+    // A platter picture can only travel as a real file upload, which FormSubmit
+    // accepts on a regular (non-AJAX) post. The browser leaves the page and
+    // FormSubmit redirects back with ?trimis so the thank-you message shows.
+    if (image && fileRef.current) {
+      try {
+        const blob = await (await fetch(image)).blob();
+        const files = new DataTransfer();
+        files.items.add(new File([blob], "platou-personalizat.jpg", { type: "image/jpeg" }));
+        fileRef.current.files = files.files;
+        const back = new URL(window.location.href);
+        back.searchParams.set(SENT_FLAG, "1");
+        back.hash = "contact";
+        const next = document.createElement("input");
+        next.type = "hidden";
+        next.name = "_next";
+        next.value = back.toString();
+        form.appendChild(next);
+        try {
+          sessionStorage.removeItem(PREFILL_KEY);
+        } catch {}
+        form.action = formAction;
+        form.method = "POST";
+        form.enctype = "multipart/form-data";
+        form.submit();
+        return;
+      } catch {
+        // No DataTransfer support: send the text without the picture.
+      }
+    }
     try {
       const res = await fetch(formEndpoint, {
         method: "POST",
@@ -68,6 +109,7 @@ export function ContactForm() {
       setStatus("sent");
       form.reset();
       setMessage("");
+      setImage(undefined);
       setSubject(subjects[0]);
     } catch {
       setStatus("error");
@@ -152,6 +194,24 @@ export function ContactForm() {
           placeholder="Ce produse vrei, cantitatea și pentru când."
         />
       </label>
+
+      {image && (
+        <div className="flex items-center gap-4 rounded-xl border border-line p-3 sm:col-span-2">
+          <img src={image} alt="Platoul tău, așa cum l-ai aranjat" className="h-20 w-auto rounded-lg" />
+          <p className="flex-1 text-sm leading-relaxed text-muted">
+            Imaginea platoului tău va fi atașată la mesaj, ca să vedem exact cum l-ai aranjat.
+          </p>
+          <button
+            type="button"
+            onClick={() => setImage(undefined)}
+            aria-label="Nu atașa imaginea platoului"
+            className="grid size-9 shrink-0 place-items-center rounded-full text-muted transition-colors hover:text-cream"
+          >
+            <X size={16} weight="bold" />
+          </button>
+        </div>
+      )}
+      {image && <input ref={fileRef} type="file" name="attachment" accept="image/jpeg" className="hidden" aria-hidden tabIndex={-1} />}
 
       {status === "error" && (
         <p role="alert" className="flex items-start gap-2 text-sm text-[#f0a08a] sm:col-span-2">

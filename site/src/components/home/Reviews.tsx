@@ -1,6 +1,6 @@
 import { Star } from "@phosphor-icons/react/dist/ssr";
 import { Reveal } from "@/components/Reveal";
-import { placeholder, reviews } from "@/lib/reviews";
+import { placeholder, reviews, showReviews } from "@/lib/reviews";
 
 function Stars({ rating, size = 16 }: { rating: number; size?: number }) {
   return (
@@ -14,7 +14,7 @@ function Stars({ rating, size = 16 }: { rating: number; size?: number }) {
 
 export function Reviews() {
   // Example reviews never reach the published site.
-  if (!reviews.length || (placeholder && process.env.NODE_ENV === "production")) return null;
+  if (!showReviews || !reviews.length || (placeholder && process.env.NODE_ENV === "production")) return null;
 
   const average = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
   const [featured, ...rest] = reviews;

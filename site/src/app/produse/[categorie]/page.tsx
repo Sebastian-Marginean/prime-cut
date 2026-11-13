@@ -26,10 +26,12 @@ export default async function CategoryPage({ params }: Params) {
       <div className="mt-8">
         <CategoryTabs current={c.slug} />
       </div>
+      <h2 className="sr-only">Produse</h2>
       <ul className="mt-14 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-        {productsIn(c.slug).map((p) => (
+        {productsIn(c.slug).map((p, i) => (
           <li key={p.slug}>
-            <ProductCard product={p} />
+            {/* The first row is on screen right away: load it first. */}
+            <ProductCard product={p} priority={i === 0} eager={i < 3} />
           </li>
         ))}
       </ul>

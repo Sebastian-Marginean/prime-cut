@@ -29,38 +29,45 @@ export type Shape = {
   name: string;
   /** Horizontal stretch: 1 is round, above 1 is oval. */
   stretch: number;
-  /** How many cheese sections fit around the center. */
+  /** Sections of sliced cheese the customer fills. */
   slots: number;
+  /** How many layers the slices are stacked in. */
+  tiers: number;
   /** What a new visitor sees first, so the board never starts empty. */
   preset: string[];
 };
+
+// Every platter also has one fixed section of cubes of cheese aged 1 year,
+// and ceafă in the middle.
+export const CUBES = "Cubulețe de brânză maturată 1 an";
+export const CENTER = "ceafă";
 
 export const shapes: Shape[] = [
   {
     persons: 6,
     name: "Rotund",
     stretch: 1,
-    slots: 6,
-    preset: ["gouda-pesto-verde", "gouda-chili-rosu", "gouda-chimion", "gouda-lavanda", "gouda-lamaie-neagra", "gouda-trufe-negre"],
+    slots: 5,
+    tiers: 2,
+    preset: ["gouda-pesto-verde", "gouda-chili-rosu", "gouda-chimion", "gouda-lavanda", "gouda-lamaie-neagra"],
   },
   {
     persons: 10,
-    name: "Oval",
-    stretch: 1.32,
-    slots: 8,
-    preset: [
-      "gouda-lavanda", "gouda-jalapeno", "gouda-mustar", "gouda-chili-rosu",
-      "gouda-pesto-verde", "gouda-lamaie-neagra", "gouda-pesto-rosu", "gouda-trufe-negre",
-    ],
+    name: "Rotund",
+    stretch: 1,
+    slots: 5,
+    tiers: 3,
+    preset: ["gouda-lavanda", "gouda-jalapeno", "gouda-pesto-rosu", "gouda-pesto-verde", "gouda-lamaie-neagra"],
   },
   {
-    persons: 20,
-    name: "Oval mare",
+    persons: 16,
+    name: "Oval",
     stretch: 1.55,
-    slots: 10,
+    slots: 9,
+    tiers: 2,
     preset: [
-      "gouda-chimion", "gouda-chili-rosu", "gouda-mustar", "gouda-lamaie-neagra", "branza-de-capra-mild",
-      "gouda-pesto-verde", "gouda-masline-si-rosii", "gouda-trufe-negre", "gouda-lavanda", "gouda-ierburi-de-gradina",
+      "gouda-chimion", "gouda-chili-rosu", "gouda-mustar", "gouda-lamaie-neagra", "gouda-pesto-verde",
+      "gouda-masline-si-rosii", "gouda-trufe-negre", "gouda-lavanda", "gouda-ierburi-de-gradina",
     ],
   },
 ];
@@ -68,4 +75,9 @@ export const shapes: Shape[] = [
 // The contact form picks this up so a finished platter arrives as a ready-made message.
 export const PREFILL_KEY = "primecut:prefill";
 export const PREFILL_EVENT = "primecut:prefill";
-export type Prefill = { subject: string; message: string };
+export type Prefill = {
+  subject: string;
+  message: string;
+  /** JPEG data URL of the platter as built, sent as an email attachment. */
+  image?: string;
+};

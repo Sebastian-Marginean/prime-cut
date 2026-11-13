@@ -1,17 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useReducedMotion } from "motion/react";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import { ArrowsClockwise, PaperPlaneTilt, Shuffle, Trash, WhatsappLogo, X } from "@phosphor-icons/react";
 import { productsIn } from "@/lib/products";
-import { looks, shapes, PREFILL_EVENT, PREFILL_KEY, type Prefill } from "@/lib/platter";
+import { looks, shapes, CENTER, CUBES, PREFILL_EVENT, PREFILL_KEY, type Prefill } from "@/lib/platter";
 import { showWhatsapp, whatsappHref, WHATSAPP_MISSING } from "@/lib/site";
 import { ProductImage } from "@/components/ProductImage";
 
 /*
   Custom platter builder. The board is drawn in SVG to match our real platters:
-  glass plate with a beaded gold rim, charcuterie rosette in the middle, cheese
-  slices fanned around it and grapes + walnuts on the edge.
+  glass plate with a beaded gold rim, ceafă in the middle, cheese slices fanned
+  around it in stacked tiers, one fixed section of cubes of cheese aged 1 year,
+  and grapes + walnuts on the edge.
 
   Everything is laid out on a circle of radius 200 and then stretched
   horizontally for the oval platters.
@@ -59,6 +60,35 @@ const ellipseLength = (a: number, b: number) => Math.PI * (3 * (a + b) - Math.sq
 
 type Drag = { slug: string; from: number | null; sx: number; sy: number; moved: boolean };
 
+// Renders the board as a JPEG (data URL) so the request email shows the platter
+// exactly as it was arranged. Selection rings and "+" marks are left out.
+async function snapshot(svg: SVGSVGElement, caption: string) {
+  const vb = svg.viewBox.baseVal;
+  const width = 1200;
+  const height = Math.round((vb.height / vb.width) * width);
+  const clone = svg.cloneNode(true) as SVGSVGElement;
+  clone.setAttribute("width", String(width));
+  clone.setAttribute("height", String(height));
+  clone.querySelectorAll("[data-ui]").forEach((el) => el.remove());
+  const img = new Image();
+  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(clone))}`;
+  await img.decode();
+  const pad = 48;
+  const canvas = document.createElement("canvas");
+  canvas.width = width + pad * 2;
+  canvas.height = height + pad * 2 + 56;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return undefined;
+  ctx.fillStyle = "#15110f";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, pad, pad, width, height);
+  ctx.fillStyle = "#f3ece4";
+  ctx.font = "600 30px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(caption, canvas.width / 2, canvas.height - pad);
+  return canvas.toDataURL("image/jpeg", 0.88);
+}
+
 export function PlatterBuilder() {
   const reduce = useReducedMotion();
   const [shapeIndex, setShapeIndex] = useState(1);
@@ -68,13 +98,18 @@ export function PlatterBuilder() {
   const [over, setOver] = useState<number | null>(null);
   const [ghost, setGhost] = useState<{ slug: string; x: number; y: number } | null>(null);
   const [notice, setNotice] = useState("");
+  const [sending, setSending] = useState(false);
   const drag = useRef<Drag | null>(null);
+  const board = useRef<SVGSVGElement>(null);
   const swallowClick = useRef(false);
 
   const n = shape.slots;
-  const span = (Math.PI * 2) / n;
-  const start = -Math.PI / 2 - span / 2;
-  const perSlot = n <= 6 ? 4 : 3;
+  // One extra section, always last, holds the cubes; it sits at the bottom.
+  const sections = n + 1;
+  const span = (Math.PI * 2) / sections;
+  const start = Math.PI / 2 - (n + 0.5) * span;
+  // Our platters have 3 slices per section in each tier.
+  const perSlot = 3;
   const s = shape.stretch;
 
   const changeShape = (i: number) => {
@@ -181,11 +216,18 @@ export function PlatterBuilder() {
   const counts = [...tally.entries()];
 
   const lines = counts.map(([slug, c]) => `- ${nameOf(slug)}${c > 1 ? ` (${c} secțiuni)` : ""}`);
-  const order = `Bună ziua! Aș dori un platou personalizat pentru ${shape.persons} persoane (${shape.name.toLowerCase()}), cu:\n${lines.join("\n")}\n\nData la care am nevoie de el: `;
+  const caption = `Platou ${shape.name.toLowerCase()} pentru ${shape.persons} persoane`;
+  const order = `Bună ziua! Aș dori un platou personalizat pentru ${shape.persons} persoane (${shape.name.toLowerCase()}, felii pe ${shape.tiers} etaje), cu:\n${lines.join("\n")}\n- ${CUBES}\n- ${CENTER[0].toUpperCase() + CENTER.slice(1)} în mijloc\n\nData la care am nevoie de el: `;
   const whatsapp = whatsappHref(order);
 
-  const send = () => {
-    const prefill: Prefill = { subject: "Platou personalizat", message: order };
+  const send = async () => {
+    setSending(true);
+    let image: string | undefined;
+    try {
+      if (board.current) image = await snapshot(board.current, caption);
+    } catch {}
+    setSending(false);
+    const prefill: Prefill = { subject: "Platou personalizat", message: order, image };
     try {
       sessionStorage.setItem(PREFILL_KEY, JSON.stringify(prefill));
     } catch {}
@@ -227,11 +269,12 @@ export function PlatterBuilder() {
       <div className="lg:sticky lg:top-28 lg:self-start">
         <div className="relative overflow-hidden rounded-2xl border border-line bg-[radial-gradient(ellipse_at_50%_45%,rgb(233_165_75/0.10),transparent_70%)] px-3 py-6 sm:px-6 sm:py-10">
           <svg
+            ref={board}
             data-plate
             viewBox={`${-W} ${-R - 14} ${W * 2} ${R * 2 + 28}`}
             className="mx-auto block w-full max-w-[40rem] select-none"
             role="group"
-            aria-label={`Platou ${shape.name.toLowerCase()} pentru ${shape.persons} persoane`}
+            aria-label={caption}
           >
             <defs>
               <radialGradient id="pb-glass" cx="50%" cy="38%" r="70%">
@@ -316,7 +359,16 @@ export function PlatterBuilder() {
                     className={`cursor-pointer outline-none ${slug ? "md:cursor-grab" : ""}`}
                   >
                     {slug ? (
-                      <Slices key={slug} slug={slug} index={i} a0={a0 + gap} a1={a1 - gap} count={perSlot} animate={!reduce} />
+                      <Slices
+                        key={`${slug}-${shape.tiers}`}
+                        slug={slug}
+                        index={i}
+                        a0={a0 + gap}
+                        a1={a1 - gap}
+                        count={perSlot}
+                        tiers={shape.tiers}
+                        animate={!reduce}
+                      />
                     ) : (
                       <path
                         d={sector(INNER + 4, OUTER, a0 + gap, a1 - gap)}
@@ -333,15 +385,27 @@ export function PlatterBuilder() {
                       stroke={isSel || isOver ? "#e9a54b" : "transparent"}
                       strokeWidth={isSel || isOver ? 2.5 : 0}
                       vectorEffect="non-scaling-stroke"
+                      data-ui
                       className="slot-ring transition-[stroke] duration-200"
                     />
                   </g>
                 );
               })}
 
-              {/* Charcuterie rosette */}
-              <Rosette />
+              {/* Fixed section: cubes of cheese aged 1 year */}
+              <path
+                d={sector(INNER + 4, OUTER, start + n * span + 0.025, start + sections * span - 0.025)}
+                fill="rgb(243 236 228 / 0.04)"
+                role="img"
+                aria-label={CUBES}
+              />
+
+              {/* Ceafă in the middle */}
+              <Ceafa />
             </g>
+
+            {/* Cubes, drawn unstretched so they stay square on the oval */}
+            <Cubes a0={start + n * span + 0.05} a1={start + sections * span - 0.05} s={s} />
 
             {/* Plus marks on empty sections (drawn unstretched) */}
             {slots.map((slug, i) => {
@@ -349,7 +413,7 @@ export function PlatterBuilder() {
               const a = start + (i + 0.5) * span;
               const r = (INNER + OUTER) / 2;
               return (
-                <g key={i} transform={`translate(${f(r * s * Math.cos(a))} ${f(r * Math.sin(a))})`} pointerEvents="none">
+                <g key={i} data-ui transform={`translate(${f(r * s * Math.cos(a))} ${f(r * Math.sin(a))})`} pointerEvents="none">
                   <circle r="11" fill="rgb(233 165 75 / 0.14)" />
                   <path d="M-4.5 0H4.5M0-4.5V4.5" stroke="#e9a54b" strokeWidth="1.8" strokeLinecap="round" />
                 </g>
@@ -384,7 +448,9 @@ export function PlatterBuilder() {
                 style={{ width: `${1.5 * sh.stretch}rem` }}
               />
               <span className="text-sm font-semibold tabular-nums">{sh.persons} persoane</span>
-              <span className="text-xs text-muted">{sh.name}</span>
+              <span className="text-xs text-muted">
+                {sh.name}, {sh.tiers} etaje
+              </span>
             </button>
           ))}
         </div>
@@ -483,16 +549,17 @@ export function PlatterBuilder() {
             <p className="mt-3 text-sm text-muted">Încă nu ai ales nicio brânză.</p>
           )}
           <p className="mt-4 border-t border-line pt-4 text-sm leading-relaxed text-muted">
-            Pentru {shape.persons} persoane. În centru punem mezeluri fine, iar pe margine struguri și nuci, ca la
-            platourile noastre clasice.
+            Pentru {shape.persons} persoane, cu feliile așezate pe {shape.tiers} etaje. Pe lângă brânzeturile alese
+            punem un compartiment de cubulețe de brânză maturată 1 an, ceafă în mijloc, iar pe margine struguri și
+            nuci, ca la platourile noastre clasice.
           </p>
           <button
             type="button"
             onClick={send}
-            disabled={!counts.length}
+            disabled={!counts.length || sending}
             className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-ember px-6 py-3 text-sm font-semibold text-ink transition-[background-color,transform] duration-300 hover:bg-[#f2b768] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
           >
-            <PaperPlaneTilt size={18} weight="bold" /> Cere ofertă pentru acest platou
+            <PaperPlaneTilt size={18} weight="bold" /> {sending ? "Se pregătește…" : "Cere ofertă pentru acest platou"}
           </button>
           {showWhatsapp && counts.length > 0 && (
             <a
@@ -525,6 +592,7 @@ function Slices({
   a0,
   a1,
   count,
+  tiers,
   animate,
 }: {
   slug: string;
@@ -532,6 +600,7 @@ function Slices({
   a0: number;
   a1: number;
   count: number;
+  tiers: number;
   animate: boolean;
 }) {
   const look = looks[slug] ?? { paste: "#f0d68c", speck: [], rind: "#d79a2a" };
@@ -546,18 +615,33 @@ function Slices({
       specks.push({ x, y, r: f(0.6 + rand() * 1.1), c: look.speck[k % look.speck.length] });
     }
   }
+  // Tiers: each layer sits a little further in and rotated, on a soft shadow,
+  // so the stack reads as slices laid on top of each other.
+  const layers = Array.from({ length: tiers }, (_, t) => ({
+    r1: INNER + 4 + t * 7,
+    r2: OUTER - t * 9,
+    shift: t * step * 0.42,
+  }));
   return (
     <g className={animate ? "slice-in" : undefined}>
-      {Array.from({ length: count }, (_, k) => {
-        const s0 = a0 + k * step;
-        const s1 = s0 + step;
-        return (
-          <g key={k}>
-            <path d={sector(INNER + 4, OUTER, s0, s1)} fill={look.paste} stroke="rgb(0 0 0 / 0.28)" strokeWidth="0.7" />
-            <path d={sector(OUTER - 5, OUTER, s0, s1)} fill={look.rind} />
-          </g>
-        );
-      })}
+      {layers.map((l, t) => (
+        <g key={t}>
+          {t > 0 && (
+            <path d={sector(l.r1, l.r2 + 2, a0 + l.shift, a1)} fill="#000" opacity="0.28" transform="translate(1.5 2.5)" />
+          )}
+          {Array.from({ length: count }, (_, k) => {
+            const w = (a1 - a0 - l.shift) / count;
+            const s0 = a0 + l.shift + k * w;
+            const s1 = s0 + w;
+            return (
+              <g key={k}>
+                <path d={sector(l.r1, l.r2, s0, s1)} fill={look.paste} stroke="rgb(0 0 0 / 0.28)" strokeWidth="0.7" />
+                <path d={sector(l.r2 - 5, l.r2, s0, s1)} fill={look.rind} />
+              </g>
+            );
+          })}
+        </g>
+      ))}
       {specks.map((p, k) => (
         <circle key={k} cx={p.x} cy={p.y} r={p.r} fill={p.c} opacity="0.85" />
       ))}
@@ -566,25 +650,64 @@ function Slices({
   );
 }
 
-// Folded slices of cured ham, drawn once: two rings of overlapping folds.
-function Rosette() {
+// Cubes of cheese aged 1 year, packed on a polar grid inside their section.
+function Cubes({ a0, a1, s }: { a0: number; a1: number; s: number }) {
+  const rand = rng(1234);
+  const cubes: { x: number; y: number; deg: number; tone: string }[] = [];
+  for (let r = INNER + 16; r <= OUTER - 10; r += 16) {
+    const across = Math.max(1, Math.floor(((a1 - a0) * r) / 16));
+    for (let k = 0; k < across; k++) {
+      const a = a0 + ((k + 0.5) / across) * (a1 - a0) + (rand() - 0.5) * 0.03;
+      const rr = r + (rand() - 0.5) * 3;
+      cubes.push({
+        x: f(rr * s * Math.cos(a)),
+        y: f(rr * Math.sin(a)),
+        deg: f((a * 180) / Math.PI + (rand() - 0.5) * 24),
+        tone: ["#f1d27e", "#e9c56a", "#f5dc93"][k % 3],
+      });
+    }
+  }
+  return (
+    <g pointerEvents="none">
+      {cubes.map((c, i) => (
+        <g key={i} transform={`translate(${c.x} ${c.y}) rotate(${c.deg})`}>
+          <rect x="-6.5" y="-6.5" width="13" height="13" rx="1.6" fill="#000" opacity="0.3" transform="translate(1 1.6)" />
+          <rect x="-6.5" y="-6.5" width="13" height="13" rx="1.6" fill={c.tone} stroke="#b8902f" strokeWidth="0.6" />
+          <path d="M-5 -4.6H4.6" stroke="#fff6d6" strokeOpacity="0.7" strokeWidth="1.1" strokeLinecap="round" />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+// Ceafă: folded slices of cured pork neck, deep red with white marbling,
+// in rings of overlapping folds.
+function Ceafa() {
   const ring = (count: number, radius: number, rx: number, ry: number, offset: number) =>
     Array.from({ length: count }, (_, i) => {
       const a = (i / count) * Math.PI * 2 + offset;
       const [x, y] = polar(radius, a);
       return { x, y, deg: f((a * 180) / Math.PI + 90), tone: i % 3 };
     });
-  const tones = ["#b8434c", "#c9575d", "#a8363f"];
+  const tones = ["#8f2a33", "#a53a42", "#7b222b"];
   const fold = (p: { x: number; y: number; deg: number; tone: number }, rx: number, ry: number, k: string) => (
     <g key={k} transform={`translate(${p.x} ${p.y}) rotate(${p.deg})`}>
       <ellipse rx={rx} ry={ry} fill={tones[p.tone]} />
+      <path
+        d={`M${f(-rx * 0.7)} ${f(ry * 0.05)}C${f(-rx * 0.2)} ${f(-ry * 0.35)} ${f(rx * 0.15)} ${f(ry * 0.4)} ${f(rx * 0.65)} ${f(-ry * 0.1)}`}
+        stroke="#f3e2d8"
+        strokeOpacity="0.3"
+        strokeWidth="1"
+        fill="none"
+        strokeLinecap="round"
+      />
       <path d={`M${-rx + 3} ${f(-ry * 0.35)}Q0 ${f(-ry - 2)} ${rx - 3} ${f(-ry * 0.35)}`} stroke="#f4dcd5" strokeOpacity="0.85" strokeWidth="2.4" fill="none" strokeLinecap="round" />
       <path d={`M${f(-rx * 0.5)} ${f(ry * 0.2)}Q0 ${f(ry * 0.45)} ${f(rx * 0.55)} ${f(ry * 0.1)}`} stroke="#f4dcd5" strokeOpacity="0.35" strokeWidth="1.2" fill="none" />
     </g>
   );
   return (
     <g pointerEvents="none">
-      <circle r={INNER - 2} fill="#6e232b" />
+      <circle r={INNER - 2} fill="#5e1b22" />
       {ring(11, 44, 21, 13, 0).map((p, i) => fold(p, 21, 13, `o${i}`))}
       {ring(8, 24, 17, 11, 0.3).map((p, i) => fold(p, 17, 11, `m${i}`))}
       {ring(4, 8, 12, 9, 0.7).map((p, i) => fold(p, 12, 9, `c${i}`))}

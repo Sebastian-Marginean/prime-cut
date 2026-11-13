@@ -2,34 +2,34 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { productHref, productsIn } from "@/lib/products";
+import { srcSet } from "@/components/ProductImage";
 
 export function Platters() {
   const platters = productsIn("platouri");
   const [current, setCurrent] = useState(1);
-  const reduce = useReducedMotion();
   const p = platters[current];
 
   return (
     <section aria-labelledby="platouri" className="mx-auto max-w-7xl px-4 py-24 sm:px-6 md:py-32">
       <div className="grid items-center gap-10 md:grid-cols-[1.25fr_1fr] md:gap-16">
         <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-line bg-ink-2">
-          <AnimatePresence initial={false} mode="popLayout">
-            <motion.img
-              key={p.slug}
-              src={`/img/${p.slug}-1600.webp`}
-              srcSet={`/img/${p.slug}-800.webp 800w, /img/${p.slug}-1600.webp 1600w`}
+          {/* All sizes stay mounted and crossfade; the hidden ones load lazily. */}
+          {platters.map((item, i) => (
+            <img
+              key={item.slug}
+              src={`/img/${item.slug}-800.webp`}
+              srcSet={srcSet(item.slug)}
               sizes="(min-width: 768px) 55vw, 100vw"
-              alt={`${p.name}: brânzeturi colorate, mezeluri, struguri și nuci`}
+              alt={i === current ? `${item.name}: brânzeturi colorate, ceafă, struguri și nuci` : ""}
+              aria-hidden={i !== current || undefined}
               loading="lazy"
-              className="absolute inset-0 size-full object-cover"
-              initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 1.04 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: reduce ? 0.2 : 0.7, ease: [0.16, 1, 0.3, 1] }}
+              decoding="async"
+              className={`absolute inset-0 size-full object-cover transition-[opacity,transform] duration-700 ease-out-expo motion-reduce:transition-none ${
+                i === current ? "scale-100 opacity-100" : "scale-[1.04] opacity-0"
+              }`}
             />
-          </AnimatePresence>
+          ))}
         </div>
 
         <div>
@@ -37,7 +37,7 @@ export function Platters() {
             Platouri gata de pus pe masă.
           </h2>
           <p className="mt-5 max-w-md text-lg leading-relaxed text-muted">
-            Brânzeturi în mai multe arome, mezeluri fine, struguri și nuci. Alegi mărimea, noi le aranjăm.
+            Gouda în mai multe arome, cubulețe de brânză maturată 1 an, ceafă în mijloc, struguri și nuci. Alegi mărimea, noi le aranjăm.
           </p>
 
           <div role="tablist" aria-label="Mărimea platoului" className="mt-8 inline-flex rounded-full border border-line p-1">
@@ -48,18 +48,11 @@ export function Platters() {
                 type="button"
                 aria-selected={i === current}
                 onClick={() => setCurrent(i)}
-                className={`relative rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-300 ${
-                  i === current ? "text-ink" : "text-cream/80 hover:text-cream"
+                className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-300 ${
+                  i === current ? "bg-ember text-ink" : "text-cream/80 hover:text-cream"
                 }`}
               >
-                {i === current && (
-                  <motion.span
-                    layoutId="platter-pill"
-                    className="absolute inset-0 -z-0 rounded-full bg-ember"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-                <span className="relative">{item.facts[0].value}</span>
+                {item.facts[0].value}
               </button>
             ))}
           </div>

@@ -52,7 +52,9 @@ export function Footer() {
         <div className="mx-auto grid max-w-7xl gap-12 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.5fr_1fr_1fr_1.1fr]">
           <div>
             <img
-              src="/img/logo-wide-1400.webp"
+              src="/img/logo-wide-720.webp"
+              srcSet="/img/logo-wide-360.webp 360w, /img/logo-wide-540.webp 540w, /img/logo-wide-720.webp 720w"
+              sizes="208px"
               alt="Prime Cut Meat"
               width={280}
               height={187}
@@ -126,7 +128,7 @@ export function Footer() {
               {socials.map(({ href, label, handle }) => (
                 <li key={label}>
                   <a href={href} {...(isExternal(href) ? { target: "_blank", rel: "noopener noreferrer" } : {})} className={link}>
-                    {label} <span className="text-muted/60">· {handle}</span>
+                    {label} <span className="text-muted">· {handle}</span>
                   </a>
                 </li>
               ))}
