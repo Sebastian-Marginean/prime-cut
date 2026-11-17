@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
-import { getCategory, getProduct, isCutout, products, productsIn } from "@/lib/products";
+import { getCategory, getProduct, isCutout, productHref, products, productsIn } from "@/lib/products";
 import { ProductImage } from "@/components/ProductImage";
 import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/Button";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 type Params = { params: Promise<{ categorie: string; slug: string }> };
 
@@ -17,7 +17,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const p = getProduct(categorie, slug);
   if (!p) return {};
   const img = isCutout(p.slug) ? `/img/${p.slug}-900.webp` : `/img/${p.slug}-1600.webp`;
-  return { title: p.name, description: p.description, openGraph: { images: [img] } };
+  const url = productHref(p);
+  return {
+    title: p.name,
+    description: `${p.short} ${p.description}`.slice(0, 300),
+    alternates: { canonical: url },
+    openGraph: { url, images: [img] },
+  };
 }
 
 export default async function ProductPage({ params }: Params) {
@@ -32,12 +38,13 @@ export default async function ProductPage({ params }: Params) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-12 pt-28 sm:px-6 md:pt-36">
-      <Link
-        href={`/produse/${c.slug}/`}
-        className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-ember"
-      >
-        <ArrowLeft size={16} weight="bold" /> {c.name}
-      </Link>
+      <Breadcrumbs
+        items={[
+          { name: "Produse", href: "/produse/" },
+          { name: c.name, href: `/produse/${c.slug}/` },
+          { name: p.name, href: productHref(p) },
+        ]}
+      />
 
       <div className="mt-8 grid items-center gap-10 md:grid-cols-[1.2fr_1fr] md:gap-16">
         <div

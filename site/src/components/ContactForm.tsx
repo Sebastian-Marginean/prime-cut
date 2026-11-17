@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CheckCircle, PaperPlaneTilt, WarningCircle, X } from "@phosphor-icons/react";
+import { CheckCircle, Clock, PaperPlaneTilt, WarningCircle, X } from "@phosphor-icons/react";
 import { formAction, formEndpoint, site } from "@/lib/site";
 import { PREFILL_EVENT, PREFILL_KEY, type Prefill } from "@/lib/platter";
 
@@ -16,6 +16,24 @@ type Status = "idle" | "sending" | "sent" | "error";
 // After a form with an attachment is posted, FormSubmit sends the visitor back here.
 const SENT_FLAG = "trimis";
 
+// One message every 2 minutes per browser, so a double click or an impatient
+// visitor can't flood the inbox.
+const COOLDOWN_MS = 2 * 60 * 1000;
+const LAST_SENT_KEY = "pc-last-sent";
+
+function readLastSent() {
+  try {
+    return Number(localStorage.getItem(LAST_SENT_KEY)) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+const mmss = (ms: number) => {
+  const t = Math.ceil(ms / 1000);
+  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
+};
+
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [subject, setSubject] = useState(subjects[0]);
@@ -23,6 +41,26 @@ export function ContactForm() {
   const [image, setImage] = useState<string>();
   const messageRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [lastSent, setLastSent] = useState(0);
+  const [now, setNow] = useState(0);
+  const waitMs = lastSent + COOLDOWN_MS - now;
+  const waiting = lastSent > 0 && waitMs > 0;
+
+  // Tick once a second while the cooldown runs, to show the countdown.
+  useEffect(() => {
+    if (!waiting) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [waiting]);
+
+  function markSent() {
+    const t = Date.now();
+    setLastSent(t);
+    setNow(t);
+    try {
+      localStorage.setItem(LAST_SENT_KEY, String(t));
+    } catch {}
+  }
 
   // A platter built in the configurator arrives here as a ready-made message.
   useEffect(() => {
@@ -37,6 +75,8 @@ export function ContactForm() {
         el?.setSelectionRange(el.value.length, el.value.length);
       }, 600);
     };
+    setLastSent(readLastSent());
+    setNow(Date.now());
     const url = new URL(window.location.href);
     if (url.searchParams.has(SENT_FLAG)) {
       setStatus("sent");
@@ -69,6 +109,13 @@ export function ContactForm() {
       setStatus("error");
       return;
     }
+    // Another tab may have sent a message in the meantime.
+    const last = Math.max(lastSent, readLastSent());
+    if (Date.now() < last + COOLDOWN_MS) {
+      setLastSent(last);
+      setNow(Date.now());
+      return;
+    }
     setStatus("sending");
     // A platter picture can only travel as a real file upload, which FormSubmit
     // accepts on a regular (non-AJAX) post. The browser leaves the page and
@@ -93,6 +140,7 @@ export function ContactForm() {
         form.action = formAction;
         form.method = "POST";
         form.enctype = "multipart/form-data";
+        markSent();
         form.submit();
         return;
       } catch {
@@ -106,6 +154,7 @@ export function ContactForm() {
         body: data,
       });
       if (!res.ok) throw new Error(String(res.status));
+      markSent();
       setStatus("sent");
       form.reset();
       setMessage("");
@@ -224,14 +273,22 @@ export function ContactForm() {
         </p>
       )}
 
+      {waiting && (
+        <p role="status" className="flex items-start gap-2 text-sm text-muted sm:col-span-2">
+          <Clock size={18} weight="bold" className="mt-0.5 shrink-0 text-ember" />
+          Ai trimis deja un mesaj. Poți trimite altul în{" "}
+          <span className="tabular-nums font-semibold text-cream">{mmss(waitMs)}</span>.
+        </p>
+      )}
+
       <div className="flex flex-wrap items-center justify-between gap-4 sm:col-span-2">
         <p className="max-w-xs text-xs leading-relaxed text-muted">
           Folosim datele doar ca să îți răspundem la mesaj.
         </p>
         <button
           type="submit"
-          disabled={status === "sending"}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-ember px-6 py-3 text-sm font-semibold text-ink transition-[background-color,transform] duration-300 ease-out-expo hover:bg-[#f2b768] active:scale-[0.98] disabled:opacity-60"
+          disabled={status === "sending" || waiting}
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-ember px-6 py-3 text-sm font-semibold text-ink transition-[background-color,transform] duration-300 ease-out-expo hover:bg-[#f2b768] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
         >
           <PaperPlaneTilt size={18} weight="bold" />
           {status === "sending" ? "Se trimite…" : "Trimite mesajul"}

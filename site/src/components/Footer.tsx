@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, FacebookLogo, InstagramLogo, WhatsappLogo } from "@phosphor-icons/react/dist/ssr";
 import { categories } from "@/lib/products";
-import { showWhatsapp, site, telHref, whatsappHref, WHATSAPP_MISSING } from "@/lib/site";
+import { fullAddress, mapsHref, showWhatsapp, site, telHref, whatsappHref, WHATSAPP_MISSING } from "@/lib/site";
 
 const explore = [
   { href: "/#maturare", label: "Cum maturăm carnea" },
@@ -124,7 +124,13 @@ export function Footer() {
                   <a href={`mailto:${site.email}`} className={link}>{site.email}</a>
                 </li>
               )}
-              {site.address && <li>{site.address}</li>}
+              {fullAddress && (
+                <li>
+                  <a href={mapsHref} target="_blank" rel="noopener noreferrer" className={link}>
+                    {fullAddress}
+                  </a>
+                </li>
+              )}
               {socials.map(({ href, label, handle }) => (
                 <li key={label}>
                   <a href={href} {...(isExternal(href) ? { target: "_blank", rel: "noopener noreferrer" } : {})} className={link}>
@@ -145,7 +151,7 @@ export function Footer() {
         </div>
 
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 pb-8 text-xs text-muted/70 sm:px-6">
-          <p>© {year} {site.name}. Toate drepturile rezervate.</p>
+          <p>© {year} {site.legalName}. Toate drepturile rezervate.</p>
           <a href="#continut" className={link}>
             Înapoi sus ↑
           </a>

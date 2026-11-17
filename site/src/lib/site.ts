@@ -2,13 +2,22 @@
 // any field left empty is simply hidden.
 export const site = {
   name: "Prime Cut Meat",
-  url: "https://primecut.ro", // TODO: domeniul real
+  legalName: "PRIME CUT MEAT SRL",
+  url: "https://primecut.ro",
   description:
     "Carne de vită maturată 14-21 de zile, brânzeturi olandeze și platouri pregătite la comandă.",
   phone: "0773 861 499",
   whatsapp: "40773861499",
   email: "office.primecutmeat@gmail.com",
-  address: "", // TODO: adresa magazinului sau zona de livrare
+  address: "Str. Câmpul Libertății 25",
+  // Orașul apare în titlurile paginilor și în datele pentru Google, ca site-ul
+  // să apară la căutări de tipul „carne maturată <oraș>”.
+  city: "Blaj",
+  county: "Alba",
+  postalCode: "515400",
+  // Codul din Google Search Console, metoda „Etichetă HTML”: doar valoarea din
+  // content="...", ex. "abc123XYZ".
+  googleVerification: "",
   hours: [
     { days: "Luni - Vineri", time: "08:00 - 18:00" },
     { days: "Sâmbătă", time: "08:00 - 14:00" },
@@ -24,6 +33,12 @@ export const site = {
 export const formEndpoint = site.formEmail ? `https://formsubmit.co/ajax/${site.formEmail}` : "";
 // Regular (non-AJAX) endpoint, used when the message carries a file attachment.
 export const formAction = site.formEmail ? `https://formsubmit.co/${site.formEmail}` : "";
+
+// "Str. Câmpul Libertății 25, Blaj, jud. Alba", skipping whatever is empty.
+export const fullAddress = [site.address, site.city, site.county && `jud. ${site.county}`].filter(Boolean).join(", ");
+export const mapsHref = fullAddress
+  ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${site.name}, ${fullAddress}`)}`
+  : "";
 
 export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;
 

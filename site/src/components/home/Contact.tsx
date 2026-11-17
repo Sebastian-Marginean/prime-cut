@@ -2,7 +2,7 @@ import { Phone, WhatsappLogo, EnvelopeSimple, MapPin, InstagramLogo, FacebookLog
 import { Button } from "@/components/Button";
 import { ContactForm } from "@/components/ContactForm";
 import { Reveal } from "@/components/Reveal";
-import { showWhatsapp, site, telHref, whatsappHref, WHATSAPP_MISSING } from "@/lib/site";
+import { fullAddress, mapsHref, showWhatsapp, site, telHref, whatsappHref, WHATSAPP_MISSING } from "@/lib/site";
 
 export function Contact() {
   const hasContact = site.phone || site.whatsapp || site.email;
@@ -40,10 +40,12 @@ export function Contact() {
                 <a href={`mailto:${site.email}`} className="hover:text-ember">{site.email}</a>
               </li>
             )}
-            {site.address && (
+            {fullAddress && (
               <li className="flex items-center gap-3">
-                <MapPin size={18} className="text-ember" />
-                {site.address}
+                <MapPin size={18} className="shrink-0 text-ember" />
+                <a href={mapsHref} target="_blank" rel="noopener noreferrer" className="hover:text-ember">
+                  {fullAddress}
+                </a>
               </li>
             )}
             {site.instagram && (

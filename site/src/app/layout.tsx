@@ -4,6 +4,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { WhatsappButton } from "@/components/WhatsappButton";
 import { site } from "@/lib/site";
+import { JsonLd } from "@/components/JsonLd";
+import { businessJsonLd, inCity, websiteJsonLd } from "@/lib/seo";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -15,14 +17,22 @@ const archivo = Archivo({
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: { default: "Prime Cut Meat | Carne de vită maturată", template: "%s | Prime Cut Meat" },
-  description: site.description,
+  title: {
+    default: `Carne de vită maturată, platouri și brânzeturi${inCity} | Prime Cut Meat`,
+    template: "%s | Prime Cut Meat",
+  },
+  description: `Carne de vită maturată 14-21 de zile (tomahawk, T-bone, antricot), platouri de brânzeturi pregătite la comandă și 18 sortimente de Gouda olandez${inCity}.`,
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "ro_RO",
     siteName: site.name,
+    url: "/",
     images: [{ url: "/img/tomahawk-1600.webp", width: 1600, height: 865 }],
   },
+  twitter: { card: "summary_large_image" },
+  robots: { index: true, follow: true, "max-image-preview": "large" },
+  ...(site.googleVerification && { verification: { google: site.googleVerification } }),
 };
 
 export const viewport: Viewport = {
@@ -44,6 +54,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="continut">{children}</main>
         <Footer />
         <WhatsappButton />
+        <JsonLd data={businessJsonLd()} />
+        <JsonLd data={websiteJsonLd()} />
       </body>
     </html>
   );

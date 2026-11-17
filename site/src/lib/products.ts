@@ -9,6 +9,8 @@ export type Category = {
   tagline: string;
   description: string;
   cover: string;
+  /** Page title for search results: the words people actually type. */
+  seoTitle: string;
 };
 
 export type Product = {
@@ -28,6 +30,7 @@ export const categories: Category[] = [
     description:
       "Tăieturi de vită maturate 14-21 de zile. Timpul face carnea mai fragedă și îi concentrează gustul.",
     cover: "t-bone",
+    seoTitle: "Carne de vită maturată: tomahawk, T-bone, antricot",
   },
   {
     slug: "platouri",
@@ -36,6 +39,7 @@ export const categories: Category[] = [
     description:
       "Gouda în mai multe arome, cubulețe de brânză maturată 1 an și ceafă în mijloc, cu struguri și nuci, pregătite la comandă.",
     cover: "platou-10-persoane",
+    seoTitle: "Platouri de brânzeturi la comandă pentru 6, 10 sau 16 persoane",
   },
   {
     slug: "branzeturi",
@@ -44,6 +48,7 @@ export const categories: Category[] = [
     description:
       "Roți de Gouda de la Huizer Kaas-Gilde, din Olanda: clasice, cu ierburi, condimente, trufe sau lapte de capră.",
     cover: "gouda-trufe-negre",
+    seoTitle: "Brânzeturi olandeze: 18 sortimente de Gouda",
   },
 ];
 

@@ -7,6 +7,7 @@ import { CustomPlatter } from "@/components/CustomPlatter";
 import { Cheeses } from "@/components/home/Cheeses";
 import { Reviews } from "@/components/home/Reviews";
 import { Contact } from "@/components/home/Contact";
+import { Faq } from "@/components/home/Faq";
 
 export default function HomePage() {
   return (
@@ -19,6 +20,7 @@ export default function HomePage() {
       <CustomPlatter />
       <Cheeses />
       <Reviews />
+      <Faq />
       <Contact />
     </>
   );

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { categories, getCategory, productsIn } from "@/lib/products";
+import { categories, getCategory, isCutout, productsIn } from "@/lib/products";
 import { CategoryTabs } from "@/components/CategoryTabs";
 import { ProductCard } from "@/components/ProductCard";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CustomPlatter } from "@/components/CustomPlatter";
 
 type Params = { params: Promise<{ categorie: string }> };
@@ -12,7 +13,14 @@ export const generateStaticParams = () => categories.map((c) => ({ categorie: c.
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const c = getCategory((await params).categorie);
-  return c ? { title: c.name, description: c.description } : {};
+  if (!c) return {};
+  const url = `/produse/${c.slug}/`;
+  return {
+    title: c.seoTitle,
+    description: c.description,
+    alternates: { canonical: url },
+    openGraph: { url, images: [`/img/${c.cover}-${isCutout(c.cover) ? 900 : 1600}.webp`] },
+  };
 }
 
 export default async function CategoryPage({ params }: Params) {
@@ -21,7 +29,13 @@ export default async function CategoryPage({ params }: Params) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-12 pt-32 sm:px-6 md:pt-40">
-      <h1 className="font-display text-4xl font-semibold md:text-6xl">{c.name}</h1>
+      <Breadcrumbs
+        items={[
+          { name: "Produse", href: "/produse/" },
+          { name: c.name, href: `/produse/${c.slug}/` },
+        ]}
+      />
+      <h1 className="font-display mt-6 text-4xl font-semibold md:text-6xl">{c.name}</h1>
       <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted">{c.description}</p>
       <div className="mt-8">
         <CategoryTabs current={c.slug} />

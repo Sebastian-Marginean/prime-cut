@@ -3,16 +3,20 @@ import Link from "next/link";
 import { categories, productsIn } from "@/lib/products";
 import { CategoryTabs } from "@/components/CategoryTabs";
 import { ProductCard } from "@/components/ProductCard";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export const metadata: Metadata = {
-  title: "Produse",
-  description: "Carne de vită maturată, platouri și brânzeturi olandeze de la Prime Cut Meat.",
+  title: "Produse: carne de vită maturată, platouri și brânzeturi",
+  description:
+    "Toate produsele Prime Cut Meat: tomahawk, T-bone, antricot și vrăbioară maturate 14-21 de zile, platouri de brânzeturi pentru 6, 10 sau 16 persoane și Gouda olandez.",
+  alternates: { canonical: "/produse/" },
 };
 
 export default function ProductsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 pb-12 pt-32 sm:px-6 md:pt-40">
-      <h1 className="font-display text-4xl font-semibold md:text-6xl">Produse</h1>
+      <Breadcrumbs items={[{ name: "Produse", href: "/produse/" }]} />
+      <h1 className="font-display mt-6 text-4xl font-semibold md:text-6xl">Produse</h1>
       <div className="mt-8">
         <CategoryTabs />
       </div>
