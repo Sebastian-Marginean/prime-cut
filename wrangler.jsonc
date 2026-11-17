@@ -1,0 +1,15 @@
+// Cloudflare Workers config. The site is a static export (site/out), served as
+// static assets: no server code runs. site/public/_headers (copied into out/)
+// sets the security and cache headers.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "prime-cut",
+  "compatibility_date": "2026-06-01",
+  "assets": {
+    "directory": "./site/out",
+    // URLs end in "/" (trailingSlash in next.config.ts).
+    "html_handling": "auto-trailing-slash",
+    // Unknown URLs get the site's 404 page.
+    "not_found_handling": "404-page"
+  }
+}
