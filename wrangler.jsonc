@@ -1,15 +1,26 @@
 // Cloudflare Workers config. The site is a static export (site/out), served as
-// static assets: no server code runs. site/public/_headers (copied into out/)
-// sets the security and cache headers.
+// static assets. site/public/_headers (copied into out/) sets the security and
+// cache headers. The only server code is the contact form (worker/index.ts).
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "prime-cut",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-06-01",
   "assets": {
     "directory": "./site/out",
+    "binding": "ASSETS",
     // URLs end in "/" (trailingSlash in next.config.ts).
     "html_handling": "auto-trailing-slash",
     // Unknown URLs get the site's 404 page.
-    "not_found_handling": "404-page"
-  }
+    "not_found_handling": "404-page",
+    // Only the contact form runs code; every page and image is served directly.
+    "run_worker_first": ["/api/*"]
+  },
+  // Contact form. The Resend API key is a secret, set in the dashboard:
+  // Workers -> prime-cut -> Settings -> Variables and Secrets -> RESEND_API_KEY.
+  "vars": {
+    "CONTACT_TO": "office.primecutmeat@gmail.com",
+    "MAIL_FROM": "Prime Cut Meat <site@primecut.ro>"
+  },
+  "observability": { "enabled": true }
 }

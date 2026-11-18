@@ -24,15 +24,11 @@ export const site = {
   ],
   instagram: "https://www.instagram.com/prime_cut_meat/",
   facebook: "https://www.facebook.com/profile.php?id=61592600999375",
-  // Contact form delivery. The site is static, so messages go through
-  // FormSubmit (formsubmit.co): put the inbox here and the first message
-  // triggers a one-time confirmation email to that address.
-  formEmail: "office.primecutmeat@gmail.com",
 };
 
-export const formEndpoint = site.formEmail ? `https://formsubmit.co/ajax/${site.formEmail}` : "";
-// Regular (non-AJAX) endpoint, used when the message carries a file attachment.
-export const formAction = site.formEmail ? `https://formsubmit.co/${site.formEmail}` : "";
+// Contact form: handled by the Cloudflare Worker (worker/index.ts), which sends
+// the message by email. Only exists on the deployed site (or `wrangler dev`).
+export const contactEndpoint = "/api/contact";
 
 // "Str. Câmpul Libertății 25, Blaj, jud. Alba", skipping whatever is empty.
 export const fullAddress = [site.address, site.city, site.county && `jud. ${site.county}`].filter(Boolean).join(", ");

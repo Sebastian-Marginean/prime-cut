@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CheckCircle, Clock, PaperPlaneTilt, WarningCircle, X } from "@phosphor-icons/react";
-import { formAction, formEndpoint, site } from "@/lib/site";
+import { contactEndpoint, site } from "@/lib/site";
 import { PREFILL_EVENT, PREFILL_KEY, type Prefill } from "@/lib/platter";
 
 const subjects = ["Carne de vită", "Platou", "Platou personalizat", "Brânzeturi", "Altceva"];
@@ -13,11 +13,8 @@ const label = "text-sm font-semibold text-cream";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
-// After a form with an attachment is posted, FormSubmit sends the visitor back here.
-const SENT_FLAG = "trimis";
-
-// One message every 2 minutes per browser, so a double click or an impatient
-// visitor can't flood the inbox.
+// One message every 2 minutes, so a double click or an impatient visitor can't
+// flood the inbox. The server (worker/index.ts) enforces the same limit.
 const COOLDOWN_MS = 2 * 60 * 1000;
 const LAST_SENT_KEY = "pc-last-sent";
 
@@ -40,11 +37,10 @@ export function ContactForm() {
   const [message, setMessage] = useState("");
   const [image, setImage] = useState<string>();
   const messageRef = useRef<HTMLTextAreaElement>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
   const [lastSent, setLastSent] = useState(0);
   const [now, setNow] = useState(0);
   const waitMs = lastSent + COOLDOWN_MS - now;
-  const waiting = lastSent > 0 && waitMs > 0;
+  const waiting = status !== "sending" && lastSent > 0 && waitMs > 0;
 
   // Tick once a second while the cooldown runs, to show the countdown.
   useEffect(() => {
@@ -53,8 +49,7 @@ export function ContactForm() {
     return () => clearInterval(id);
   }, [waiting]);
 
-  function markSent() {
-    const t = Date.now();
+  function markSent(t = Date.now()) {
     setLastSent(t);
     setNow(t);
     try {
@@ -77,12 +72,6 @@ export function ContactForm() {
     };
     setLastSent(readLastSent());
     setNow(Date.now());
-    const url = new URL(window.location.href);
-    if (url.searchParams.has(SENT_FLAG)) {
-      setStatus("sent");
-      url.searchParams.delete(SENT_FLAG);
-      window.history.replaceState(null, "", url.pathname + url.search + url.hash);
-    }
     try {
       const saved = sessionStorage.getItem(PREFILL_KEY);
       if (saved) {
@@ -105,10 +94,6 @@ export function ContactForm() {
     const form = e.currentTarget;
     const data = new FormData(form);
     if (data.get("_honey")) return; // bots fill the hidden field
-    if (!formEndpoint) {
-      setStatus("error");
-      return;
-    }
     // Another tab may have sent a message in the meantime.
     const last = Math.max(lastSent, readLastSent());
     if (Date.now() < last + COOLDOWN_MS) {
@@ -117,42 +102,17 @@ export function ContactForm() {
       return;
     }
     setStatus("sending");
-    // A platter picture can only travel as a real file upload, which FormSubmit
-    // accepts on a regular (non-AJAX) post. The browser leaves the page and
-    // FormSubmit redirects back with ?trimis so the thank-you message shows.
-    if (image && fileRef.current) {
-      try {
-        const blob = await (await fetch(image)).blob();
-        const files = new DataTransfer();
-        files.items.add(new File([blob], "platou-personalizat.jpg", { type: "image/jpeg" }));
-        fileRef.current.files = files.files;
-        const back = new URL(window.location.href);
-        back.searchParams.set(SENT_FLAG, "1");
-        back.hash = "contact";
-        const next = document.createElement("input");
-        next.type = "hidden";
-        next.name = "_next";
-        next.value = back.toString();
-        form.appendChild(next);
-        try {
-          sessionStorage.removeItem(PREFILL_KEY);
-        } catch {}
-        form.action = formAction;
-        form.method = "POST";
-        form.enctype = "multipart/form-data";
-        markSent();
-        form.submit();
-        return;
-      } catch {
-        // No DataTransfer support: send the text without the picture.
-      }
-    }
     try {
-      const res = await fetch(formEndpoint, {
-        method: "POST",
-        headers: { Accept: "application/json" },
-        body: data,
-      });
+      // The platter picture travels as a real file, attached to the email.
+      if (image) data.append("attachment", await (await fetch(image)).blob(), "platou-personalizat.jpg");
+      const res = await fetch(contactEndpoint, { method: "POST", body: data });
+      if (res.status === 429) {
+        // Sent from this connection less than 2 minutes ago: show the real wait.
+        const { retryAfter = 120 } = await res.json().catch(() => ({}));
+        markSent(Date.now() - (COOLDOWN_MS - retryAfter * 1000));
+        setStatus("idle");
+        return;
+      }
       if (!res.ok) throw new Error(String(res.status));
       markSent();
       setStatus("sent");
@@ -188,9 +148,6 @@ export function ContactForm() {
     <form onSubmit={submit} className="grid gap-5 sm:grid-cols-2">
       <h3 className="font-display text-2xl font-semibold sm:col-span-2">Scrie-ne un mesaj</h3>
 
-      <input type="hidden" name="_subject" value={`Mesaj nou de pe site: ${subject}`} />
-      <input type="hidden" name="_template" value="table" />
-      <input type="hidden" name="_captcha" value="false" />
       <input type="text" name="_honey" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
 
       <label className="block">
@@ -260,16 +217,11 @@ export function ContactForm() {
           </button>
         </div>
       )}
-      {image && <input ref={fileRef} type="file" name="attachment" accept="image/jpeg" className="hidden" aria-hidden tabIndex={-1} />}
 
       {status === "error" && (
         <p role="alert" className="flex items-start gap-2 text-sm text-[#f0a08a] sm:col-span-2">
           <WarningCircle size={18} weight="bold" className="mt-0.5 shrink-0" />
-          {formEndpoint
-            ? "Mesajul nu a putut fi trimis. Încearcă din nou sau contactează-ne telefonic."
-            : process.env.NODE_ENV !== "production"
-              ? "Formularul nu are încă adresa de email. Completează formEmail în src/lib/site.ts."
-              : `Mesajul nu a putut fi trimis.${site.phone ? ` Sună-ne la ${site.phone}.` : ""}`}
+          {`Mesajul nu a putut fi trimis. Încearcă din nou${site.phone ? ` sau sună-ne la ${site.phone}` : ""}.`}
         </p>
       )}
 

@@ -1,2 +1,6 @@
 # Original photos; the site uses optimized copies in site/assets/source
 images/
+
+# Cloudflare Worker local files
+.dev.vars
+.wrangler/
