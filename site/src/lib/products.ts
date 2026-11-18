@@ -108,7 +108,7 @@ const meat: Product[] = [
   {
     slug: "vrabioara",
     category: "carne-de-vita",
-    name: "Vrăbioară de vită maturată 21 zile",
+    name: "Vrăbioară de vită maturată 14 zile",
     short: "Tăietură fragedă, cu puțină grăsime.",
     description:
       "O tăietură cu mai puțină grăsime, apreciată pentru textura fragedă, gustul bogat și aroma intensă. Maturată 14 zile.",
