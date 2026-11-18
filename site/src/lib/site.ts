@@ -19,8 +19,8 @@ export const site = {
   // content="...", ex. "abc123XYZ".
   googleVerification: "",
   hours: [
-    { days: "Luni - Vineri", time: "08:00 - 18:00" },
-    { days: "Sâmbătă", time: "08:00 - 14:00" },
+    { days: "Luni - Vineri", time: "08:00 - 16:00" },
+    { days: "Sâmbătă", time: "09:00 - 14:00" },
   ],
   instagram: "https://www.instagram.com/prime_cut_meat/",
   facebook: "https://www.facebook.com/profile.php?id=61592600999375",
