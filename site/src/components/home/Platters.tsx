@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { productHref, productsIn } from "@/lib/products";
 import { srcSet } from "@/components/ProductImage";
+import { Price } from "@/components/Price";
 
 export function Platters() {
   const platters = productsIn("platouri");
@@ -57,9 +58,10 @@ export function Platters() {
             ))}
           </div>
 
-          <p className="mt-6 max-w-md leading-relaxed text-muted" aria-live="polite">
-            {p.description}
-          </p>
+          <div aria-live="polite">
+            <Price product={p} className="mt-8 max-w-md" />
+            <p className="mt-5 max-w-md leading-relaxed text-muted">{p.description}</p>
+          </div>
           <Link
             href={productHref(p)}
             className="mt-6 inline-block text-sm font-semibold text-ember underline-offset-4 hover:underline"

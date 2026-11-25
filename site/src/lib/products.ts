@@ -20,6 +20,8 @@ export type Product = {
   short: string;
   description: string;
   facts: { label: string; value: string }[];
+  /** Price in lei, per kg for meat ("perKg") or per piece for platters. */
+  price?: { lei: number; perKg?: boolean; weight: string };
 };
 
 export const categories: Category[] = [
@@ -65,6 +67,7 @@ const meat: Product[] = [
       { label: "Tip", value: "Cu os lung" },
       { label: "Recomandare", value: "Grătar pe cărbuni, gătire indirectă și rumenire la final" },
     ],
+    price: { lei: 135, perKg: true, weight: "800-1300 g" },
   },
   {
     slug: "t-bone",
@@ -78,6 +81,7 @@ const meat: Product[] = [
       { label: "Tip", value: "Cu os în formă de T" },
       { label: "Recomandare", value: "Grătar sau tigaie de fontă, foc puternic" },
     ],
+    price: { lei: 140, perKg: true, weight: "450-900 g" },
   },
   {
     slug: "antricot-cu-os",
@@ -91,6 +95,7 @@ const meat: Product[] = [
       { label: "Tip", value: "Cu os" },
       { label: "Recomandare", value: "Tigaie de fontă sau grătar, apoi 5-10 minute de odihnă" },
     ],
+    price: { lei: 115, perKg: true, weight: "350-450 g" },
   },
   {
     slug: "antricot-fara-os",
@@ -104,6 +109,7 @@ const meat: Product[] = [
       { label: "Tip", value: "Fără os" },
       { label: "Recomandare", value: "Tigaie de fontă sau grătar, foc puternic, apoi 5 minute de odihnă" },
     ],
+    price: { lei: 125, perKg: true, weight: "280-400 g" },
   },
   {
     slug: "vrabioara",
@@ -117,18 +123,19 @@ const meat: Product[] = [
       { label: "Tip", value: "Fără os" },
       { label: "Recomandare", value: "Steak-uri în tigaie sau friptură întreagă la cuptor" },
     ],
+    price: { lei: 125, perKg: true, weight: "180-250 g" },
   },
 ];
 
 // Platter layout: cheese sections (triangles stacked in tiers) plus one section of
 // cubes of cheese aged 1 year, with ceafă in the middle. Mirrors src/lib/platter.ts.
 const platterSpecs = [
-  { persons: 6, slices: 5, tiers: 2, shape: "rotund" },
-  { persons: 10, slices: 5, tiers: 3, shape: "rotund" },
-  { persons: 16, slices: 9, tiers: 2, shape: "oval" },
+  { persons: 6, slices: 5, tiers: 2, shape: "rotund", lei: 120, weight: "0,8 kg" },
+  { persons: 10, slices: 5, tiers: 3, shape: "rotund", lei: 150, weight: "1,2 kg" },
+  { persons: 16, slices: 9, tiers: 2, shape: "oval", lei: 250, weight: "1,8 kg" },
 ];
 
-const platters: Product[] = platterSpecs.map(({ persons: n, slices, tiers, shape }) => ({
+const platters: Product[] = platterSpecs.map(({ persons: n, slices, tiers, shape, lei, weight }) => ({
   slug: `platou-${n}-persoane`,
   category: "platouri" as const,
   name: `Platou pentru ${n} persoane`,
@@ -140,6 +147,7 @@ const platters: Product[] = platterSpecs.map(({ persons: n, slices, tiers, shape
     { label: "Conține", value: "Gouda în mai multe arome, ceafă, struguri, nuci" },
     { label: "Comandă", value: "Cu cel puțin o zi înainte" },
   ],
+  price: { lei, weight },
 }));
 
 // Cheese card text follows one template: "Brânză maturată 6 luni, 50% grăsime,

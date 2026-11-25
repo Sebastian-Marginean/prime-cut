@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { isCutout, productHref, type Product } from "@/lib/products";
 import { ProductImage } from "@/components/ProductImage";
+import { CardPrice } from "@/components/Price";
 
 export function ProductCard({ product: p, priority, eager }: { product: Product; priority?: boolean; eager?: boolean }) {
   const cutout = isCutout(p.slug);
@@ -28,6 +29,7 @@ export function ProductCard({ product: p, priority, eager }: { product: Product;
       </div>
       <h3 className="mt-4 text-lg font-semibold transition-colors group-hover:text-ember">{p.name}</h3>
       <p className="mt-1 text-sm text-muted">{p.short}</p>
+      <CardPrice product={p} />
     </Link>
   );
 }

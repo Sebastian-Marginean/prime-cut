@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight } from "@phosphor-icons/react";
 import { productHref, productsIn } from "@/lib/products";
 import { ProductImage } from "@/components/ProductImage";
 import { Reveal } from "@/components/Reveal";
+import { CardPrice } from "@/components/Price";
 
 const arrow =
   "grid size-11 place-items-center rounded-full border border-cream/20 text-cream transition-[background-color,border-color,color,opacity] duration-300 hover:border-ember hover:bg-ember hover:text-ink disabled:pointer-events-none disabled:opacity-30";
@@ -44,7 +45,7 @@ export function Cuts() {
     <section aria-labelledby="taieturi" className="py-24 md:py-32">
       <Reveal className="mx-auto flex max-w-7xl flex-wrap items-end justify-between gap-6 px-4 sm:px-6">
         <h2 id="taieturi" className="font-display max-w-xl text-3xl font-semibold leading-tight md:text-5xl">
-          Patru tăieturi, fiecare cu gustul ei.
+          Cinci tăieturi, fiecare cu gustul ei.
         </h2>
         <Link href="/produse/carne-de-vita/" className="text-sm font-semibold text-ember underline-offset-4 hover:underline">
           Toată carnea de vită
@@ -68,9 +69,10 @@ export function Cuts() {
                     sizes="(min-width: 1024px) 34rem, (min-width: 640px) 28rem, 85vw"
                     className="aspect-[37/20] w-full object-cover transition-transform duration-[1.2s] ease-out-expo group-hover:scale-105"
                   />
-                </div>
+                          </div>
                 <h3 className="mt-5 text-xl font-semibold transition-colors group-hover:text-ember">{p.name}</h3>
                 <p className="mt-1.5 text-muted">{p.short}</p>
+                <CardPrice product={p} />
               </Link>
             </Reveal>
           </li>

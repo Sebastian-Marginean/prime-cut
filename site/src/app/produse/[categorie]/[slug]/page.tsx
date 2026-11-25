@@ -6,6 +6,7 @@ import { ProductImage } from "@/components/ProductImage";
 import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/Button";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { Price } from "@/components/Price";
 
 type Params = { params: Promise<{ categorie: string; slug: string }> };
 
@@ -67,6 +68,7 @@ export default async function ProductPage({ params }: Params) {
 
         <div>
           <h1 className="font-display text-4xl font-semibold leading-[1.08] md:text-5xl">{p.name}</h1>
+          <Price product={p} className="mt-8" />
           <p className="mt-6 text-lg leading-relaxed text-muted">{p.description}</p>
 
           <dl className="mt-10 grid gap-4 sm:grid-cols-2">
